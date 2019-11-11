@@ -55,7 +55,7 @@
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-
+    
     return self.artistContoller.artists.count;
 }
 
@@ -73,23 +73,23 @@
 }
 
 
- #pragma mark - Navigation
- 
- 
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-     if ([segue.identifier isEqualToString:@"ViewArtist"])
-     {
-         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-         CESArtistDetailVC *detailVC = segue.destinationViewController;
-         detailVC.controller = self.artistContoller;
-         detailVC.artist = self.artist;
-     } else if ([segue.identifier isEqualToString:@"AddNewArtist"])
-     {
-         CESArtistDetailVC *detailVC = segue.destinationViewController;
-         detailVC.controller = self.artistContoller;
-     }
+#pragma mark - Navigation
 
- }
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"ViewArtist"])
+    {
+        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+        CESArtistDetailVC *detailVC = segue.destinationViewController;
+        detailVC.controller = self.artistContoller;
+        detailVC.artist = [self.artistContoller.artists objectAtIndex:indexPath.row];
+    } else if ([segue.identifier isEqualToString:@"AddNewArtist"])
+    {
+        CESArtistDetailVC *detailVC = segue.destinationViewController;
+        detailVC.controller = self.artistContoller;
+    }
+    
+}
 
 
 @end

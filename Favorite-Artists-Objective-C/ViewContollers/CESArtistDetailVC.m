@@ -44,6 +44,7 @@
     self.artistName.text = self.artist.artistName;
     self.bioTextView.text = self.artist.artistBio;
     self.yearFormed.text = [NSString stringWithFormat:@"%lu", (unsigned long)self.artist.formedYear];
+    NSLog(@"UpdateViews: %@", self.artistName);
 }
 
 - (void)saveArtist:(CESArtist *)artistResult
@@ -59,7 +60,7 @@
     NSLog(@"Artist Result for SaveBtn: %@", self.artist);
     if (self.artist)
     {
-        [self.controller.artists addObject:_artist];
+        //[self.controller.artists addObject:_artist];
         [self saveArtist:self.artist];
         [self.navigationController popToRootViewControllerAnimated:YES];
     } else {
@@ -82,7 +83,6 @@
             return;
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
-                _count++;
                 self.artist = artist;
                 NSLog(@"Artist Result: %@", self.artist);
                 [self updateViews];

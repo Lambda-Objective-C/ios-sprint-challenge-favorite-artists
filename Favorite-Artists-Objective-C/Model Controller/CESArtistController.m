@@ -40,24 +40,29 @@ NSString *baseURLString = @"https://www.theaudiodb.com/api/v1/json/1/search.php?
             return;
         }
         
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        NSError *jsonError = nil;
+        NSDictionary *results = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
         if (error)
         {
-            NSLog(@"JSON Error: %@", error);
-            completionBlock(nil, error);
+            NSLog(@"JSON Error: %@", jsonError);
+            completionBlock(nil, jsonError);
             return;
         }
         
-        NSArray *jsonDictionary = json[@"artists"];
+        //NSLog(@"%@", results);
+        
+        NSDictionary *jsonDictionary = results[@"artists"][0];
+        
+        CESArtist *artist = [[CESArtist alloc] initWithDictionary:jsonDictionary];
         
         if (jsonDictionary != (id) [NSNull null])
         {
-            CESArtist *artist = [[CESArtist alloc] initWithDictionary:jsonDictionary[0]];
+            CESArtist *artist = [[CESArtist alloc] initWithDictionary:jsonDictionary];
             [self.artists addObject:artist];
             completionBlock(artist, nil);
         }
-        NSLog(@"Error: %@", error);
-        completionBlock(nil, error);
+        NSLog(@"Error at the end of request: %@", error);
+        completionBlock(artist, error);
         
     }];
     [task resume];
