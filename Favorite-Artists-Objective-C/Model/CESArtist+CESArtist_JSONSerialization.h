@@ -15,7 +15,7 @@
 @interface CESArtist (CESArtist_JSONSerialization)
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
-- (NSDictionary *)artistData;
+- (NSDictionary *)artistDataDictionary;
 
 
 @end

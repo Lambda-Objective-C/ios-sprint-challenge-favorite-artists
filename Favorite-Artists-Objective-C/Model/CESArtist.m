@@ -14,8 +14,8 @@
 {
     if (self = [super init])
     {
-        _artistName = name;
-        _artistBio = bio;
+        _artistName = name.copy;
+        _artistBio = bio.copy;
         _formedYear = year;
     }
     return self;

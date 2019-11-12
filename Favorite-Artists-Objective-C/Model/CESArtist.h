@@ -8,14 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-
-
 @interface CESArtist : NSObject
 
 #pragma mark - Properties
-@property NSString *artistName;
-@property NSString *artistBio;
-@property int formedYear;
+@property (nonatomic, copy) NSString *artistName;
+@property (nonatomic, copy) NSString *artistBio;
+@property (nonatomic) int formedYear;
 
 #pragma mark - Methods
 - (instancetype)initWithArtistName:(NSString *)name

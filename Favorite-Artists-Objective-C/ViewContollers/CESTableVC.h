@@ -13,7 +13,7 @@
 
 @interface CESTableVC : UITableViewController
 
-@property CESArtist *artist;
+@property CESArtist *artist1;
 @property (nonatomic)CESArtistController *controller;
 
 @end

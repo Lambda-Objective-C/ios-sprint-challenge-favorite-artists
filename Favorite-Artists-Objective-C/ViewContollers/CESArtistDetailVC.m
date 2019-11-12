@@ -40,6 +40,8 @@
 }
 
 -(void)updateViews {
+    self.title = self.artist.artistName ?: @"Add New Artist";
+    
     if (!self.isViewLoaded || !self.artist) { return; }
     self.artistName.text = self.artist.artistName;
     self.bioTextView.text = self.artist.artistBio;
@@ -47,24 +49,18 @@
     NSLog(@"UpdateViews: %@", self.artistName);
 }
 
-- (void)saveArtist:(CESArtist *)artistResult
-{
-    if (artistResult)
-    {
-        
-    }
+
+- (IBAction)saveBtnPressed:(UIBarButtonItem *)sender {
+    CESArtist *artist = [[CESArtist alloc] initWithArtistName:self.artistName.text biography:self.bioTextView.text yearFormed:self.artist.formedYear];
+    [self.controller addArtist:artist];
+      [self.navigationController popViewControllerAnimated:YES];
 }
 
-
-- (IBAction)saveBtnPressed:(id)sender {
-    NSLog(@"Artist Result for SaveBtn: %@", self.artist);
-    if (self.artist)
-    {
-        //[self.controller.artists addObject:_artist];
-        [self saveArtist:self.artist];
-        [self.navigationController popToRootViewControllerAnimated:YES];
-    } else {
-        NSLog(@"There was an error saving the artist");
+- (void)setArtist:(CESArtist *)artist
+{
+    if (_artist != artist) {
+        _artist = artist;
+        [self updateViews];
     }
 }
 

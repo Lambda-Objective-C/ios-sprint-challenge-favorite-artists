@@ -17,21 +17,11 @@ typedef void (^CESArtistControllerCompletetionBlock)(CESArtist *, NSError *);
 - (void)fetchArtistWithName:(NSString *)artistName
             completionBlock:(CESArtistControllerCompletetionBlock)completionBlock;
 
-@property NSMutableArray *artists;
-- (NSMutableArray *)artistsArray;
+@property (nonatomic, readonly, copy) NSArray<CESArtist *> *artists;
 
-- (CESArtist *)objectInArtistsAtIndex:(NSUInteger)index;
-
-- (void)addArtistWithName:(NSString *)name
-                artistBio:(NSString *)bio
-               yearFormed:(int)year;
-
-- (void)update:(CESArtist *)artist
-withArtistName:(NSString *)name
-     biography:(NSString *)bio
-    yearFormed:(int)year;
-
-
+- (void)loadArtists;
+- (void)addArtist:(CESArtist *)aArtist;
+- (void)removeArtist:(CESArtist *)aArtist;
 @end
 
 

@@ -28,20 +28,9 @@
     return self;
 }
 
-- (NSDictionary *)artistData
+- (NSDictionary *)artistDataDictionary
 {
-    NSMutableDictionary *artistData = [NSMutableDictionary dictionary];
-    
-    NSString *stringYearFormed = @(self.formedYear).stringValue;
-    
-    [artistData setObject:self.artistName forKey:@"strArtist"];
-    [artistData setObject:self.artistBio forKey:@"strBiographyEN"];
-    [artistData setObject:stringYearFormed forKey:@"intFormedYear"];
-    
-    NSDictionary *artistDataDictionary = [NSDictionary dictionaryWithObjectsAndKeys:self.artistName, @"strArtist",self.artistBio, @"strBiographyEN", stringYearFormed, @"intFormedYear", nil];
-    
-    
-    return artistDataDictionary;
+    return @{@"strBiographyEN": self.artistBio, @"strArtist": self.artistName, @"intFormedYear":[[NSNumber alloc] initWithInt:self.formedYear]};
 }
 
 

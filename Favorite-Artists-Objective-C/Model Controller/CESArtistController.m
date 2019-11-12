@@ -10,6 +10,12 @@
 #import "CESArtist.h"
 #import "CESArtist+CESArtist_JSONSerialization.h"
 
+@interface CESArtistController ()
+
+@property (nonatomic) NSMutableArray<CESArtist *> *internalArtists;
+
+@end
+
 
 @implementation CESArtistController
 
@@ -19,7 +25,7 @@ NSString *baseURLString = @"https://www.theaudiodb.com/api/v1/json/1/search.php?
 {
     self = [super init];
     if (self) {
-        _artists = [@[] mutableCopy];
+        _internalArtists = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -36,72 +42,84 @@ NSString *baseURLString = @"https://www.theaudiodb.com/api/v1/json/1/search.php?
         if (error)
         {
             NSLog(@"Error fetching artist: %@", error);
-            completionBlock(nil, error);
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionBlock(nil, error);
+            });
             return;
         }
         
         NSError *jsonError = nil;
         NSDictionary *results = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-        if (error)
-        {
-            NSLog(@"JSON Error: %@", jsonError);
-            completionBlock(nil, jsonError);
-            return;
-        }
+        
+        if (!results) {
+                   NSLog(@"Error decoding json: %@", jsonError);
+                   
+                   dispatch_async(dispatch_get_main_queue(), ^{
+                       completionBlock(nil, jsonError);
+                   });
+                   
+                   return;
+               }
         
         //NSLog(@"%@", results);
         
-        NSDictionary *jsonDictionary = results[@"artists"][0];
+        NSDictionary *searchedArtist = results[@"artists"][0];
         
-        CESArtist *artist = [[CESArtist alloc] initWithDictionary:jsonDictionary];
-        
-        if (jsonDictionary != (id) [NSNull null])
-        {
-            CESArtist *artist = [[CESArtist alloc] initWithDictionary:jsonDictionary];
-            [self.artists addObject:artist];
-            completionBlock(artist, nil);
-        }
-        NSLog(@"Error at the end of request: %@", error);
-        completionBlock(artist, error);
-        
+      CESArtist *newArtist = [[CESArtist alloc] initWithDictionary:searchedArtist];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionBlock(newArtist, nil);
+            });
     }];
     [task resume];
 }
 
 #pragma mark - Add Artists
 
-- (void)addArtistWithName:(NSString *)name artistBio:(NSString *)bio yearFormed:(int)year
+- (void)loadArtists
 {
-    CESArtist *artist = [[CESArtist alloc] initWithArtistName:name biography:bio yearFormed:year];
-    [self.artists addObject:artist];
-    NSLog(@"Artist created from Controller");
+    NSURL *documentDirectory = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] firstObject] URLByAppendingPathComponent:@"artists.plist"];
+    NSMutableArray *artistDictionaries = [[NSDictionary alloc] initWithContentsOfURL:documentDirectory][@"artists"];
+    
+    for (NSDictionary *dict in artistDictionaries)
+    {
+        CESArtist *artist = [[CESArtist alloc] initWithDictionary:dict];
+        [self.internalArtists addObject:artist];
+    }
 }
 
-
-- (NSMutableArray *)artistsArray
+- (void)saveArtist
 {
-    NSArray *searchPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *directory = [searchPath objectAtIndex:0];
-    NSArray *filePaths = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:directory error:nil];
-    
-    for (NSString *artist in filePaths)
-    {
-        NSString *filePath = [[NSString alloc] initWithFormat:@"Documents/@", artist];
-        NSString *artistPath = [NSHomeDirectory()stringByAppendingPathComponent:filePath];
-        
-        NSURL *artistURL = [NSURL fileURLWithPath:artistPath];
-        NSData *artistData = [[NSData alloc] initWithContentsOfURL:artistURL];
-        
-        if (artistData != nil)
-        {
-            NSDictionary *artistDictionary = [NSJSONSerialization JSONObjectWithData:artistData options:0 error:nil];
-            CESArtist *artist = [[CESArtist alloc] initWithDictionary:artistDictionary];
-            [self.artists addObject:artist];
-        } else {
-            NSLog(@"Artist data is nil");
-        }
-    }
-    return self.artists;
+    NSURL *documentDirectory = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] firstObject] URLByAppendingPathComponent:@"artists.plist"];
+       
+       NSMutableArray *artistDictionaries = [[NSMutableArray alloc] init];
+       
+       for (CESArtist *artist in self.internalArtists)
+       {
+           [artistDictionaries addObject:[artist artistDataDictionary]];
+       }
+       
+       NSDictionary *dict = @{@"artists":artistDictionaries};
+       
+       [dict writeToURL:documentDirectory atomically:YES];
+}
+
+- (void)addArtist:(CESArtist *)aArtist
+{
+    [self.internalArtists addObject:aArtist];
+    [self saveArtist];
+}
+
+- (void)removeArtist:(CESArtist *)aArtist
+{
+    [self.internalArtists removeObject:aArtist];
+    [self saveArtist];
+}
+
+- (NSArray<CESArtist *> *)artists
+{
+    return [self.internalArtists copy];
 }
 
 @end
