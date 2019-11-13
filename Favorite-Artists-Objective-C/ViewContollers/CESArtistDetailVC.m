@@ -36,6 +36,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _artistSearchBar.delegate = self;
+    if (self.artist)
+    {
+        [self.artistSearchBar setHidden:YES];
+    }
     [self updateViews];
 }
 
