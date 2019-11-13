@@ -52,25 +52,33 @@ NSString *baseURLString = @"https://www.theaudiodb.com/api/v1/json/1/search.php?
         NSError *jsonError = nil;
         NSDictionary *results = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
         
-        if (!results) {
-                   NSLog(@"Error decoding json: %@", jsonError);
-                   
-                   dispatch_async(dispatch_get_main_queue(), ^{
-                       completionBlock(nil, jsonError);
-                   });
-                   
-                   return;
-               }
+        
+        @try {
+           NSDictionary *searchedArtist = results[@"artists"][0];
+            
+            CESArtist *newArtist = [[CESArtist alloc] initWithDictionary:searchedArtist];
+                       
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           completionBlock(newArtist, nil);
+                       });
+
+        }
+        @catch (NSException * e) {
+             NSLog(@"Error decoding json: %@", jsonError);
+                            
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                completionBlock(nil, jsonError);
+                            });
+                            
+                            return;
+        }
+        
         
         //NSLog(@"%@", results);
         
-        NSDictionary *searchedArtist = results[@"artists"][0];
         
-      CESArtist *newArtist = [[CESArtist alloc] initWithDictionary:searchedArtist];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completionBlock(newArtist, nil);
-            });
+        
+     
     }];
     [task resume];
 }

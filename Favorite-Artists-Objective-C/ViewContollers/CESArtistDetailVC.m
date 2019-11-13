@@ -75,19 +75,19 @@
     [artistSearchBar resignFirstResponder];
     
     [self.controller fetchArtistWithName:artistSearchBar.text completionBlock:^(CESArtist *artist, NSError *error) {
-        if (error) {
-            NSLog(@"Unable to fetch artist");
-             dispatch_async(dispatch_get_main_queue(), ^{
-            self.artistName.text = @"No Results Found, Try another search. ";
-             });
-            return;
-        } else {
+        if (artist) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.artist = artist;
                 NSLog(@"Artist Result: %@", self.artist);
                 [self updateViews];
             });
+            return;
         }
+        
+        NSLog(@"Unable to fetch artist");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.bioTextView.text = @"No Results Found, Try another search. ";
+        });
     }];
 }
 
